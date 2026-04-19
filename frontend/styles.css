@@ -1,0 +1,148 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: system-ui, sans-serif;
+    background: #f4f6f9;
+    color: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 16px;
+}
+
+.container {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: #555;
+    margin-top: 4px;
+}
+
+.upload-card {
+    background: #fff;
+    border: 1px solid #dde1e7;
+    border-radius: 10px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.upload-card label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.upload-card input[type="file"] {
+    font-size: 0.95rem;
+}
+
+.upload-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.preview-img {
+    cursor: zoom-in;
+}
+
+.preview-img {
+    width: auto;
+    height: 150px;
+    border-radius: 6px;
+    border: 1px solid #dde1e7;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+    z-index: 100;
+}
+
+.modal-img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+button {
+    align-self: flex-start;
+    padding: 10px 24px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+button:disabled {
+    background: #93c5fd;
+    cursor: not-allowed;
+}
+
+.result-card {
+    background: #fff;
+    border: 1px solid #dde1e7;
+    border-radius: 10px;
+    padding: 24px;
+}
+
+.result-card h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #333;
+}
+
+pre {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 16px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.error-card {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 16px 20px;
+    color: #b91c1c;
+    font-size: 0.9rem;
+}

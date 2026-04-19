@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Expense Analyzer</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div class="container">
+        <h1>AI Expense Analyzer</h1>
+        <p class="subtitle">Upload a receipt, invoice, or transaction screenshot to extract expense details.</p>
+
+        <div class="upload-card">
+            <label for="file">Document</label>
+            <div class="upload-row">
+                <input id="file" type="file" accept=".jpg,.jpeg,.png,.pdf" onchange="previewFile(this)" />
+                <img id="preview" class="preview-img" style="display:none;" alt="Document preview" />
+            </div>
+            <button id="analyzeBtn" onclick="analyze()">Analyze</button>
+        </div>
+
+        <div id="result" class="result-card" style="display:none;">
+            <h2>Response</h2>
+            <pre id="output"></pre>
+        </div>
+
+        <div id="error" class="error-card" style="display:none;">
+            <p id="errorMsg"></p>
+        </div>
+    </div>
+
+    <div id="modal" class="modal" style="display:none;" onclick="closeModal()">
+        <img id="modalImg" class="modal-img" alt="Document preview expanded" />
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+
+</html>

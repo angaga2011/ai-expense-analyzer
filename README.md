@@ -1,17 +1,19 @@
-# AI Expense Analyzer Backend (Chalice)
+# AI Expense Analyzer
 
-This backend accepts a financial document payload, stores the file in S3, extracts text with Textract, analyzes language with Comprehend, and returns a clean JSON summary for a frontend.
-
-For this starter, `/analyze` uses a JSON body with base64 file content instead of multipart upload to keep Chalice handling simple.
+Upload a receipt, invoice, or transaction screenshot. The backend stores the file in S3, extracts text with Textract, analyzes it with Comprehend, and returns a structured JSON summary. A lightweight HTML/JS frontend lets you interact with it directly in the browser.
 
 ## Project Structure
 
 ```text
+frontend/
+  index.html
+  styles.css
+  scripts.js
+
 backend/
   app.py
   requirements.txt
   .env.example
-  README.md
   chalicelib/
     __init__.py
     config.py
@@ -26,7 +28,7 @@ backend/
 
 ## Environment Variables
 
-Copy values from `.env.example` into your local environment before running:
+Copy values from `backend/.env.example` into your local environment before running:
 
 - `AWS_REGION` (default: `us-east-1`)
 - `S3_BUCKET_NAME` (required)
@@ -35,17 +37,28 @@ Copy values from `.env.example` into your local environment before running:
 
 ## Install and Run
 
+### Backend
+
 ```bash
 cd backend
 pip install -r requirements.txt
 chalice local
 ```
 
-Default local URL:
+Default local URL: `http://127.0.0.1:8000`
 
-```text
-http://127.0.0.1:8000
+### Frontend
+
+No install needed — open `frontend/index.html` directly in your browser:
+
+```bash
+# from the project root
+open frontend/index.html        # macOS
+xdg-open frontend/index.html   # Linux
+start frontend/index.html      # Windows
 ```
+
+Make sure the backend is running before using the frontend.
 
 ## API Endpoints
 
