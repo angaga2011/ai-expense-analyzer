@@ -1,6 +1,10 @@
 import os
 from dataclasses import dataclass
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 def _parse_allowed_extensions(raw_value: str) -> set[str]:
     values = [item.strip().lower().lstrip(".") for item in raw_value.split(",")]

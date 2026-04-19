@@ -4,9 +4,10 @@ from datetime import datetime
 from chalicelib.utils import truncate_preview
 
 
-AMOUNT_PATTERN = re.compile(r"(?:[$€£]\s?)?\d{1,3}(?:,\d{3})*(?:\.\d{2})")
+AMOUNT_PATTERN = re.compile(r"(?:[$€£]\s?)?\d{1,3}(?:,\d{3})*\.\d{2}(?!\d)")
 DATE_PATTERNS = [
     (re.compile(r"\b\d{4}-\d{2}-\d{2}\b"), ["%Y-%m-%d"]),
+    (re.compile(r"\b\d{4}/\d{2}/\d{2}\b"), ["%Y/%m/%d"]),
     (re.compile(r"\b\d{2}/\d{2}/\d{4}\b"), ["%m/%d/%Y", "%d/%m/%Y"]),
     (re.compile(r"\b\d{2}-\d{2}-\d{4}\b"), ["%m-%d-%Y", "%d-%m-%Y"]),
     (re.compile(r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},\s+\d{4}\b", re.IGNORECASE), ["%B %d, %Y", "%b %d, %Y"]),
@@ -27,27 +28,44 @@ def classify_document_type(text: str) -> str:
     return "unknown"
 
 
+_HIGH_PRIORITY_KEYWORDS = ["grand total", "balance due", "total"]
+_LOW_PRIORITY_KEYWORDS = ["paid", "amount due"]
+_SUMMARY_KEYWORDS = {
+    # English
+    "subtotal", "sub-total", "total", "hst", "gst", "pst", "vat", "tax",
+    "balance", "paid", "card", "cash", "mastercard", "visa", "amex", "debit", "credit",
+    # French
+    "sous-total", "tvh", "tps", "tvq",
+}
+
+
 def _extract_amount_from_lines(lines: list[str]) -> str | None:
-    priority_keywords = ["total", "amount", "paid", "balance due", "grand total"]
-    candidate_amounts: list[tuple[int, float, str]] = []
+    # Tuple: (priority, line_index, numeric_amount, raw_amount)
+    candidate_amounts: list[tuple[int, int, float, str]] = []
 
     for index, line in enumerate(lines):
         matches = AMOUNT_PATTERN.findall(line)
         if not matches:
             continue
 
-        has_priority_keyword = any(keyword in line.lower() for keyword in priority_keywords)
-        priority_score = 1 if has_priority_keyword else 0
+        lower_line = line.lower()
+        if any(keyword in lower_line for keyword in _HIGH_PRIORITY_KEYWORDS):
+            priority_score = 2
+        elif any(keyword in lower_line for keyword in _LOW_PRIORITY_KEYWORDS):
+            priority_score = 1
+        else:
+            priority_score = 0
 
         for raw_amount in matches:
             numeric_amount = float(raw_amount.replace("$", "").replace("€", "").replace("£", "").replace(",", "").strip())
-            candidate_amounts.append((priority_score, numeric_amount, raw_amount))
+            candidate_amounts.append((priority_score, index, numeric_amount, raw_amount))
 
     if not candidate_amounts:
         return None
 
+    # Sort by priority first, then by line position (later lines win within same priority)
     best = sorted(candidate_amounts, key=lambda item: (item[0], item[1]), reverse=True)[0]
-    return f"{best[1]:.2f}"
+    return f"{best[2]:.2f}"
 
 
 def extract_amount(text: str) -> str | None:
@@ -74,6 +92,47 @@ def extract_date(text: str) -> str | None:
         if parsed:
             return parsed
     return None
+
+
+def _parse_amount(raw: str) -> float:
+    return float(raw.replace("$", "").replace("€", "").replace("£", "").replace(",", "").strip())
+
+
+def extract_line_items(text: str) -> dict:
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    items = []
+    summary = []
+
+    for i, line in enumerate(lines):
+        matches = AMOUNT_PATTERN.findall(line)
+        if not matches:
+            continue
+
+        raw = matches[-1]
+        amount_str = f"{_parse_amount(raw):.2f}"
+
+        # Strip all amounts and currency symbols to get the descriptive text
+        label = AMOUNT_PATTERN.sub("", line).strip().strip("$€£@:,. ")
+
+        if not label or len(label) < 2:
+            # Amount-only line — look back for a label on the previous non-amount line
+            prev_label = None
+            for j in range(i - 1, max(i - 3, -1), -1):
+                prev = lines[j].strip()
+                if prev and not AMOUNT_PATTERN.search(prev) and len(prev) > 2:
+                    prev_label = prev
+                    break
+            if prev_label is None:
+                continue  # no usable label nearby, skip
+            label = prev_label
+
+        entry = {"text": label, "amount": amount_str}
+        if any(kw in label.lower() for kw in _SUMMARY_KEYWORDS):
+            summary.append(entry)
+        else:
+            items.append(entry)
+
+    return {"items": items, "summary": summary}
 
 
 def extract_entity(text: str, comprehend_result: dict) -> str:
@@ -107,6 +166,7 @@ def parse_document_data(text: str, comprehend_result: dict) -> dict:
     date = extract_date(text)
     entity = extract_entity(text, comprehend_result)
     summary = build_summary(document_type, amount, date, entity)
+    line_items = extract_line_items(text)
 
     return {
         "document_type": document_type,
@@ -114,5 +174,6 @@ def parse_document_data(text: str, comprehend_result: dict) -> dict:
         "date": date or "N/A",
         "entity": entity,
         "summary": summary,
+        "line_items": line_items,
         "raw_text_preview": truncate_preview(text, max_length=400) or "No text extracted.",
     }
