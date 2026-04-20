@@ -3,58 +3,57 @@
 const API_URL = "http://127.0.0.1:8000";
 
 async function analyze() {
-    const fileInput = document.getElementById("file");
-    const btn = document.getElementById("analyzeBtn");
-    const resultCard = document.getElementById("result");
-    const errorCard = document.getElementById("error");
-    const output = document.getElementById("output");
-    const errorMsg = document.getElementById("errorMsg");
+  const fileInput = document.getElementById("file");
+  const btn = document.getElementById("analyzeBtn");
+  const resultSection = document.getElementById("result");
+  const errorCard = document.getElementById("error");
 
-    resultCard.style.display = "none";
-    errorCard.style.display = "none";
+  resultSection.style.display = "none";
+  errorCard.style.display = "none";
 
-    const file = fileInput.files[0];
-    if (!file) {
-        showError("Please select a file before analyzing.");
-        return;
+  const file = fileInput.files[0];
+  if (!file) {
+    showError("Please select a file before analyzing.");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Analyzing…";
+
+  try {
+    const file_base64 = await encodeBase64(file);
+
+    const response = await fetch(`${API_URL}/analyze`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: JSON.stringify({
+        file_name: file.name,
+        content_type: file.type,
+        file_base64,
+      }),
+    });
+
+    const data = await response.json();
+
+    document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+
+    if (data.success && data.data) {
+      renderFormatted(data.data);
     }
 
-    btn.disabled = true;
-    btn.textContent = "Analyzing…";
+    resultSection.style.display = "block";
+    switchView("formatted");
 
-    try {
-        const file_base64 = await encodeBase64(file);
-
-        const response = await fetch(`${API_URL}/analyze`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
-            body: JSON.stringify({
-                file_name: file.name,
-                content_type: file.type,
-                file_base64,
-            }),
-        });
-
-        const data = await response.json();
-
-        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-        
-        if (data.success && data.data) {
-            renderFormatted(data.data);
-        }
-
-        resultSection.style.display = "block";
-        switchView("formatted");
-    } catch (err) {
-        showError(`Request failed: ${err.message}`);
-    } finally {
-        btn.disabled = false;
-        btn.textContent = "Analyze";
-        fileInput.value = "";
-    }
+  } catch (err) {
+    showError(`Request failed: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Analyze Document";
+    fileInput.value = "";
+  }
 }
 
 function renderFormatted(data) {
@@ -66,27 +65,27 @@ function renderFormatted(data) {
 
   const items = data.line_items?.items || [];
   const summary = data.line_items?.summary || [];
- 
+
   const itemsBody = document.getElementById("itemsBody");
   const summaryBody = document.getElementById("summaryBody");
   itemsBody.innerHTML = "";
   summaryBody.innerHTML = "";
- 
+
   items.forEach(item => {
     itemsBody.appendChild(makeRow(item.text, item.amount));
   });
- 
+
   summary.forEach(item => {
     summaryBody.appendChild(makeRow(item.text, item.amount, true));
   });
- 
+
   const lineItemsSection = document.getElementById("lineItemsSection");
   const summaryTableBlock = document.getElementById("summaryTableBlock");
- 
+
   lineItemsSection.style.display = (items.length > 0 || summary.length > 0) ? "block" : "none";
   summaryTableBlock.style.display = summary.length > 0 ? "block" : "none";
 }
- 
+
 function makeRow(label, amount, isBold = false) {
   const tr = document.createElement("tr");
   if (isBold) tr.classList.add("total-row");
@@ -109,7 +108,7 @@ function formatDocType(raw) {
   if (!raw) return "—";
   return raw.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
 }
- 
+
 function formatDate(dateStr) {
   try {
     const [y, m, d] = dateStr.split("-");
@@ -119,12 +118,12 @@ function formatDate(dateStr) {
     return dateStr;
   }
 }
- 
+
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
 }
- 
+
 function escapeHtml(str) {
   return String(str)
     .replace(/&/g, "&amp;")
@@ -133,37 +132,37 @@ function escapeHtml(str) {
 }
 
 function encodeBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result.toString().replace(/^data:(.*,)?/, ""));
-        reader.onerror = (err) => reject(err);
-    });
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.toString().replace(/^data:(.*,)?/, ""));
+    reader.onerror = (err) => reject(err);
+  });
 }
 
 function previewFile(input) {
-    const preview = document.getElementById("preview");
-    const file = input.files[0];
-    if (!file || file.type === "application/pdf") {
-        preview.style.display = "none";
-        return;
-    }
-    preview.src = URL.createObjectURL(file);
-    preview.style.display = "block";
-    preview.onclick = () => openModal(preview.src);
+  const preview = document.getElementById("preview");
+  const file = input.files[0];
+  if (!file || file.type === "application/pdf") {
+    preview.style.display = "none";
+    return;
+  }
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
+  preview.onclick = () => openModal(preview.src);
 }
 
 function openModal(src) {
-    document.getElementById("modalImg").src = src;
-    document.getElementById("modal").style.display = "flex";
+  document.getElementById("modalImg").src = src;
+  document.getElementById("modal").style.display = "flex";
 }
 
 function closeModal() {
-    document.getElementById("modal").style.display = "none";
+  document.getElementById("modal").style.display = "none";
 }
 
 function showError(message) {
-    const errorCard = document.getElementById("error");
-    document.getElementById("errorMsg").textContent = message;
-    errorCard.style.display = "block";
+  const errorCard = document.getElementById("error");
+  document.getElementById("errorMsg").textContent = message;
+  errorCard.style.display = "block";
 }
