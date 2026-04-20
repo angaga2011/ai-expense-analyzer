@@ -36,7 +36,6 @@ body {
   gap: 28px;
 }
 
-/* ── Header ─────────────────────────────────────── */
 
 header {
   text-align: center;
@@ -63,7 +62,6 @@ h1 {
   font-style: italic;
 }
 
-/* ── Upload Card ─────────────────────────────────── */
 
 .upload-card {
   background: var(--white);
@@ -109,7 +107,6 @@ h1 {
 
 .preview-img:hover { opacity: 0.85; }
 
-/* ── Button ──────────────────────────────────────── */
 
 button {
   padding: 11px 28px;
@@ -129,7 +126,6 @@ button:hover { background: var(--navy-mid); }
 button:active { transform: scale(0.98); }
 button:disabled { background: #94a3b8; cursor: not-allowed; }
 
-/* ── Result Section ──────────────────────────────── */
 
 .result-section {
   display: flex;
@@ -143,7 +139,6 @@ button:disabled { background: #94a3b8; cursor: not-allowed; }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Toggle ──────────────────────────────────────── */
 
 .view-toggle {
   display: flex;
@@ -180,7 +175,6 @@ button:disabled { background: #94a3b8; cursor: not-allowed; }
   background: transparent;
 }
 
-/* ── View Panels ─────────────────────────────────── */
 
 .view-panel {
   background: var(--white);
@@ -193,7 +187,6 @@ button:disabled { background: #94a3b8; cursor: not-allowed; }
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* ── Summary Card ────────────────────────────────── */
 
 .summary-grid {
   display: grid;
@@ -254,7 +247,6 @@ button:disabled { background: #94a3b8; cursor: not-allowed; }
   padding: 0 2px;
 }
 
-/* ── Line Items ──────────────────────────────────── */
 
 .line-items-section {
   display: flex;
@@ -324,7 +316,6 @@ tbody tr.total-row td {
   font-family: 'IBM Plex Mono', monospace;
 }
 
-/* ── Raw JSON ────────────────────────────────────── */
 
 .result-card { width: 100%; }
 
@@ -341,7 +332,6 @@ pre {
   word-break: break-word;
 }
 
-/* ── Error Card ──────────────────────────────────── */
 
 .error-card {
   background: #fef2f2;
@@ -352,7 +342,6 @@ pre {
   font-size: 0.9rem;
 }
 
-/* ── Modal ───────────────────────────────────────── */
 
 .modal {
   position: fixed;
@@ -372,7 +361,6 @@ pre {
   object-fit: contain;
 }
 
-/* ── Responsive ──────────────────────────────────── */
 
 @media (max-width: 480px) {
   .summary-grid { grid-template-columns: 1fr; }
