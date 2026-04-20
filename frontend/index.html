@@ -10,8 +10,10 @@
 
 <body>
     <div class="container">
-        <h1>AI Expense Analyzer</h1>
-        <p class="subtitle">Upload a receipt, invoice, or transaction screenshot to extract expense details.</p>
+        <header>
+            <h1>Expense Analyzer</h1>
+            <p class="subtitle">Upload a receipt, invoice, or transaction screenshot...</p>
+        </header>
 
         <div class="upload-card">
             <label for="file">Document</label>
@@ -23,9 +25,69 @@
         </div>
 
         <div id="result" class="result-card" style="display:none;">
-            <h2>Response</h2>
-            <pre id="output"></pre>
+            <div class="view-toggle">
+                <button class="toggle-btn active" id="btnFormatted" onclick="switchView('formatted')">Formatted</button>
+                <button class="toggle-btn" id="btnRaw" onclick="switchView('raw')">Raw JSON</button>
         </div>
+
+    <div id="viewFormatted" class="view-panel">
+        <div class="summary-card">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Document Type</span>
+              <span class="summary-value" id="fDocType">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Merchant / Entity</span>
+              <span class="summary-value" id="fEntity">—</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Date</span>
+              <span class="summary-value mono" id="fDate">—</span>
+            </div>
+            <div class="summary-item highlight">
+              <span class="summary-label">Total Amount</span>
+              <span class="summary-value mono large" id="fAmount">—</span>
+            </div>
+          </div>
+          <p class="summary-text" id="fSummary"></p>
+        </div>
+ 
+        <div id="lineItemsSection" class="line-items-section" style="display:none;">
+          <div class="table-block">
+            <h3 class="table-title">Line Items</h3>
+            <table id="itemsTable">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th class="col-amount">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="itemsBody"></tbody>
+            </table>
+          </div>
+ 
+          <div class="table-block" id="summaryTableBlock" style="display:none;">
+            <h3 class="table-title">Totals</h3>
+            <table id="summaryTable">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th class="col-amount">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="summaryBody"></tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+
+    <div id="viewRaw" class="view-panel" style="display:none;">
+        <div class="result-card">
+          <pre id="output"></pre>
+        </div>
+      </div>
+    </div>
 
         <div id="error" class="error-card" style="display:none;">
             <p id="errorMsg"></p>
