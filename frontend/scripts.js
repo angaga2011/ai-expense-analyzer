@@ -105,6 +105,33 @@ function switchView(view) {
   document.getElementById("btnRaw").classList.toggle("active", !isFormatted);
 }
 
+function formatDocType(raw) {
+  if (!raw) return "—";
+  return raw.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+}
+ 
+function formatDate(dateStr) {
+  try {
+    const [y, m, d] = dateStr.split("-");
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return `${months[parseInt(m, 10) - 1]} ${parseInt(d, 10)}, ${y}`;
+  } catch {
+    return dateStr;
+  }
+}
+ 
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+ 
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 function encodeBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
